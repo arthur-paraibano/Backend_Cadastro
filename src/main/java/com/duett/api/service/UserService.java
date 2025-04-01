@@ -131,7 +131,7 @@ public class UserService {
                 isUpdate && user != null ? user.getPassword() : new BCryptPasswordEncoder().encode(dto.password()));
         userModel.setCpf(dto.cpf());
         userModel.setProfile(profileUpper);
-        userModel.setFirstLogin(true);
+        userModel.setFirstLogin(false);
 
         return repository.save(userModel);
     }
