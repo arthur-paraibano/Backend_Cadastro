@@ -1,23 +1,31 @@
+Aqui está o conteúdo ajustado para o `README.md` do seu repositório backend (`Backend_Cadastro`), com base no que você forneceu e nos detalhes do projeto que trabalhamos juntos. Incluí as informações de seeding com os usuários padrão (`ADMIN` e `JOAO`) e adaptei os endpoints para refletir o que foi implementado no desafio técnico.
+
+---
+
+### `README.md` para o Backend (`Backend_Cadastro`)
+
+```markdown
 # API Login e Cadastro de Usuários - Backend
 
-Bem-vindo ao repositório `Backend_Cadastro`! Este projeto é uma aplicação backend desenvolvida como parte de um teste técnico ou exemplo de implementação. Ele inclui endpoints para gerenciamento de usuários e outras funcionalidades básicas, com foco em demonstrar boas práticas de desenvolvimento e organização de código.
+Bem-vindo ao repositório `Backend_Cadastro`! Este projeto é uma aplicação backend desenvolvida como parte de um desafio técnico para demonstrar habilidades em desenvolvimento web com Java Spring Boot. Ele implementa uma API REST para autenticação e gerenciamento de usuários, atendendo aos requisitos de um sistema de login seguro e funcional.
 
 ## Objetivo
-O objetivo deste repositório é fornecer uma base funcional para uma API backend, incluindo operações CRUD (criação, leitura, atualização e exclusão) e autenticação básica com geração de tokens. Este projeto pode ser utilizado como ponto de partida para aprendizado ou como referência em processos seletivos.
+O objetivo deste repositório é fornecer uma API backend funcional para autenticação de usuários, cadastro, troca de senha e gerenciamento de usuários por administradores, com foco em segurança, boas práticas e integração com um frontend React.
 
 ## Tecnologias Utilizadas
 
-- **Linguagem**: [Java]
-- **Framework**: [Spring Boot]
-- **Banco de Dados**: [H2]
-- **Outras Dependências**: [JWT para autenticação]
+- **Linguagem**: Java 21
+- **Framework**: Spring Boot
+- **Banco de Dados**: H2 (in-memory)
+- **Segurança**: Spring Security com autenticação básica
+- **Outras Dependências**: JPA/Hibernate, Lombok
 
 ## Pré-requisitos
 
 Antes de rodar o projeto, certifique-se de ter instalado:
-- [Linguagem e versão, Java 21]
-- [Gerenciador de dependências, Maven]
-- [Banco de dados, H2]
+- Java 21 (JDK)
+- Maven (gerenciador de dependências)
+- Git (para clonar o repositório)
 
 ## Como Rodar o Projeto
 
@@ -29,125 +37,190 @@ Antes de rodar o projeto, certifique-se de ter instalado:
 
 2. **Instale as dependências**:
    ```bash
-   [Comando específico, mvn install]
+   mvn install
    ```
 
 3. **Configure o ambiente**:
-   - Crie um arquivo `.env` ou ajuste as configurações no arquivo `[nome do arquivo de configuração]` com as seguintes variáveis:
+   - O projeto usa um banco H2 in-memory, então não é necessária configuração adicional. As propriedades estão em `src/main/resources/application.properties`:
      ```
-     DB_URL=[jdbc:h2:mem:duett]
-     DB_USERNAME=[root]
-     DB_PASSWORD=[root]
+     spring.datasource.url=jdbc:h2:mem:testdb
+     spring.datasource.driverClassName=org.h2.Driver
+     spring.datasource.username=sa
+     spring.datasource.password=
+     spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+     spring.h2.console.enabled=true
+     spring.jpa.hibernate.ddl-auto=update
      ```
 
 4. **Inicie a aplicação**:
    ```bash
-   [Comando específico, mvn spring-boot:run]
+   mvn spring-boot:run
    ```
 
 5. **Teste os endpoints**:
-   - A API estará disponível em `http://localhost:8080` (ou a porta configurada).
+   - A API estará disponível em `http://localhost:8080`.
+   - Acesse o console H2 em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:testdb`, usuário: `sa`, senha: vazia) para verificar os dados.
+
+## Seeding do Banco de Dados
+O banco é populado automaticamente ao iniciar a aplicação com dois usuários padrão:
+- **Administrador**:
+  - Usuário: `ADMIN`
+  - Senha: `admin123`
+  - Perfil: `ADMINISTRADOR`
+- **Usuário Comum**:
+  - Usuário: `JOAO`
+  - Senha: `joao123`
+  - Perfil: `USUÁRIO`
+
+ Esses dados são inseridos via código Java (`DatabaseSeeder.java`), atendendo ao requisito de seeding sem uso de arquivos de backup.
 
 ## Estrutura da API
 
 ### Endpoints Principais
 
-- **POST /create**: Cria um novo recurso.
-  - Exemplo de corpo da requisição:
+- **POST /create**  
+  Cria um novo usuário.
+  - **Corpo da requisição**:
     ```json
     {
         "name": "string",
         "email": "string",
         "password": "string",
         "cpf": "string",
-        "profile": "string"
+        "profile": "USUÁRIO ou ADMINISTRADOR"
     }
     ```
-  - Resposta de sucesso: `201 - Created with success`.
+  - **Resposta de sucesso**: `201 - Created`
+  - **Resposta de erro**: `400 - Nome, e-mail ou CPF já cadastrado`
 
-- **POST /user/id**: Busca um usuário pelo ID.
-  - Exemplo de corpo da requisição:
+- **POST /auth/login**  
+  Realiza o login e retorna dados do usuário.
+  - **Corpo da requisição**:
     ```json
     {
-        "Id": "0"
+        "name": "string",
+        "password": "string"
     }
     ```
-  - Resposta de erro: `404 - User not found`.
-
-- **PUT /user/update**: Atualiza um recurso existente.
-    - Exemplo de corpo da requisição:
+  - **Resposta de sucesso**:
     ```json
     {
-        "id": 0,
+        "token": "eRubB3uKHncVStOCE",
+        "id": 1,
+        "name": "ADMIN",
+        "email": "admin@duett.com",
+        "cpf": "123.456.789-00",
+        "profile": "ADMINISTRADOR",
+        "firstLogin": false
+    }
+    ```
+  - **Resposta de erro**: `401 - Credenciais inválidas`
+
+- **PUT /user/update**  
+  Atualiza os dados de um usuário (ex.: troca de senha).
+  - **Corpo da requisição**:
+    ```json
+    {
+        "id": 1,
         "name": "string",
         "email": "string",
         "password": "string",
         "cpf": "string",
-        "profile": "string"
+        "profile": "USUÁRIO ou ADMINISTRADOR"
     }
     ```
-  - Resposta de sucesso: `200 - Update completed`.
+  - **Resposta de sucesso**: `200 - Updated`
+  - **Resposta de erro**: `404 - User not found`
 
-- **DELETE /user/delete**: Remove um recurso.
-    - Exemplo de corpo da requisição:
+- **DELETE /user/delete**  
+  Remove um usuário pelo ID.
+  - **Corpo da requisição**:
     ```json
     {
-        "Id": "0"
+        "id": 1
     }
     ```
-  - Resposta de sucesso: `200 - Successfully deleted`.
+  - **Resposta de sucesso**: `200 - Successfully deleted`
+  - **Resposta de erro**: `404 - User not found`
+
+- **GET /user/all**  
+  Lista todos os usuários (acesso apenas para administradores).
+  - **Resposta de sucesso**:
+    ```json
+    [
+        {
+            "id": 1,
+            "name": "ADMIN",
+            "email": "admin@duett.com",
+            "cpf": "123.456.789-00",
+            "profile": "ADMINISTRADOR"
+        },
+        ...
+    ]
+    ```
+  - **Resposta de erro**: `403 - Forbidden`
 
 ### Mensagens de Resposta
-
-A API utiliza mensagens padronizadas para informar o resultado das operações:
-
-- **Sucesso**:
-  - `Created with success`
-  - `Update completed`
-  - `Successfully deleted`
-  - `Password changed`
-
-- **Erro**:
-  - `The ID cannot be null`
-  - `User not found`
-  - `Username and password are required`
-  - `Error generating token`
+A API retorna mensagens padronizadas via `RestMessage`:
+- **Sucesso**: `"Created"`, `"Updated"`, `"Successfully deleted"`
+- **Erro**: `"Nome, e-mail ou CPF já cadastrado"`, `"Credenciais inválidas"`, `"User not found"`, `"Forbidden"`
 
 ## Exemplos de Uso
 
-### Criando um Usuário
+### Login como Administrador
 ```bash
-curl -X 'POST' \
-  'http://localhost:8080/auth/login' \
-  -H 'accept: application/json' \
+curl -X POST \
+  http://localhost:8080/auth/login \
   -H 'Content-Type: application/json' \
   -d '{
-  "name": "arthur",
-  "password": "12345"
+    "name": "ADMIN",
+    "password": "admin123"
 }'
 ```
-
-### Resposta Esperada
+**Resposta**:
 ```json
 {
-  "token": "eRubB3uKHncVStOCE",
-  "id": 1,
-  "name": "ARTHUR",
-  "email": "ARTHK0@GMAIL.COM",
-  "profile": "USUÁRIO",
-  "firstLogin": true
+    "token": "eRubB3uKHncVStOCE",
+    "id": 1,
+    "name": "ADMIN",
+    "email": "admin@duett.com",
+    "cpf": "123.456.789-00",
+    "profile": "ADMINISTRADOR",
+    "firstLogin": false
+}
+```
+
+### Cadastro de Novo Usuário
+```bash
+curl -X POST \
+  http://localhost:8080/create \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "maria",
+    "email": "maria@duett.com",
+    "password": "maria123",
+    "cpf": "111.222.333-44",
+    "profile": "USUÁRIO"
+}'
+```
+**Resposta**:
+```json
+{
+    "id": 3,
+    "name": "maria",
+    "email": "maria@duett.com",
+    "cpf": "111.222.333-44",
+    "profile": "USUÁRIO"
 }
 ```
 
 ## Contribuição
-
-Contribuições são bem-vindas! Siga os passos abaixo:
+Contribuições são bem-vindas! Siga os passos:
 1. Faça um fork do repositório.
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`).
+2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`).
 3. Commit suas mudanças (`git commit -m "Adiciona nova funcionalidade"`).
-4. Envie para o repositório remoto (`git push origin feature/nova-funcionalidade`).
+4. Push para o remoto (`git push origin feature/nova-funcionalidade`).
 5. Abra um Pull Request.
 
 ## Contato
-
-Desenvolvido por [Arthur Paraibano](https://github.com/arthur-paraibano). Para dúvidas ou sugestões, abra uma issue ou entre em contato diretamente pelo GitHub.
+Desenvolvido por [Arthur Paraibano](https://github.com/arthur-paraibano). Para dúvidas ou sugestões, abra uma issue ou entre em contato pelo GitHub.
