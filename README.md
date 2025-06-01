@@ -1,8 +1,4 @@
-Aqui está o conteúdo ajustado para o `README.md` do seu repositório backend (`Backend_Cadastro`), com base no que você forneceu e nos detalhes do projeto que trabalhamos juntos. Incluí as informações de seeding com os usuários padrão (`ADMIN` e `JOAO`) e adaptei os endpoints para refletir o que foi implementado no desafio técnico.
-
----
-
-### `README.md` para o Backend (`Backend_Cadastro`)
+### Backend (`Backend_Cadastro`)
 
 ```markdown
 # API Login e Cadastro de Usuários - Backend
